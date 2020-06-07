@@ -15,4 +15,12 @@ export function sendMsg(data) {
     data
   })
 }
+export function saveOrEditMsg(data) {
+  return request({
+    url: 'admin/mp/temMsg/saveOrEditMsg',
+    method: 'post',
+    data
+  })
+}
+
 

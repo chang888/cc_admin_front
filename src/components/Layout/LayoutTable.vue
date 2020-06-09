@@ -147,7 +147,7 @@ export default {
           item.loading = false
         })
         this.list = rs.data.list
-        this.pager = rs.pager
+        this.pager = rs.data.pager
       }
       this.autoHeight()
       this.loading = false

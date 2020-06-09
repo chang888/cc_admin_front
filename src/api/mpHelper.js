@@ -15,11 +15,27 @@ export function sendMsg(data) {
     data
   })
 }
+
 export function saveOrEditMsg(data) {
   return request({
-    url: 'admin/mp/temMsg/saveOrEditMsg',
+    url: 'admin/mp/temMsg/saveOrEdit',
     method: 'post',
     data
+  })
+}
+
+export function delMsg(id) {
+  return request({
+    url: 'admin/mp/temMsg/delete',
+    method: 'post',
+    data: {id}
+  })
+}
+
+export function getMsgList() {
+  return request({
+    url: 'admin/mp/temMsg/getMsgList',
+    method: 'post',
   })
 }
 

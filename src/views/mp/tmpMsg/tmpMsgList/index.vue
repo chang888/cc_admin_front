@@ -3,6 +3,9 @@
     <LayoutPage>
     <el-button size="big" type="primary" @click="addDialogShow=true">新建消息</el-button>
     <LayoutTable  ref="msgList" url="/admin/mp/temMsg/getMsgList"  @loaded="loading=false" showPager >
+     <el-table-column prop="id" label="id" width="80" align="center">
+              <!-- <template slot-scope="scope">{{scope.$index + 1}}</template> -->
+        </el-table-column>
         <el-table-column prop="title" label="推送主题" width="150" align="center">
               <!-- <template slot-scope="scope">{{scope.$index + 1}}</template> -->
         </el-table-column>
@@ -46,7 +49,7 @@
                 label="操作"
                 width="100">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="primary" @click="gotoEdit(scope.row.template_id)">选择</el-button>
+                    <el-button size="mini" type="primary" @click="newMsg({template_id: scope.row.template_id})">选择</el-button>
                 </template>
               </el-table-column>
         </LayoutTable>
@@ -74,8 +77,9 @@ export default {
   methods: {
     async del(row) {
       let rs = await delMsg(row.id)
-      console.log(rs, "删除会掉")
-
+      if (rs.code == 0) {
+        this.onSearch()
+      }
     },
     async getMsgList() {
       let rs = await getMsgList()
@@ -84,8 +88,12 @@ export default {
         this.temList = rs.data.list
       }
     },
-    gotoEdit(id) {
-      this.$router.push(`tmpMsgEdit/${id}`)
+    gotoEdit({template_id, id}) {
+      this.$router.push(`tmpMsgEdit?template_id=${template_id}&id=${id}`)
+    },
+    newMsg({template_id}){
+      this.$router.push(`tmpMsgEdit?template_id=${template_id}`)
+
     },
     onSearch() {
       this.loading = true

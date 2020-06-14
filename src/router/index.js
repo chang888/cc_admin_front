@@ -117,7 +117,7 @@ export const constantRoutes = [
             meta: { title: '发送日志' }
           },
           {
-            path: 'tmpMsgEdit/:templateId',
+            path: 'tmpMsgEdit',
             component: () => import('@/views/mp/tmpMsg/tmpMsgEdit'),
             name: 'TmpMsgEdit',
             hidden: true,

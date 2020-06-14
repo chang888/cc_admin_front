@@ -23,7 +23,13 @@ export function saveOrEditMsg(data) {
     data
   })
 }
-
+export function getOne(id) {
+  return request({
+    url: 'admin/mp/temMsg/getOne',
+    method: 'post',
+    data: {id}
+  })
+}
 export function delMsg(id) {
   return request({
     url: 'admin/mp/temMsg/delete',

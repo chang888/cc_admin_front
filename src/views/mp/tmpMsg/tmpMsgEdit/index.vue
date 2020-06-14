@@ -1,10 +1,10 @@
 <template>
   <div v-if="temObj">
     <LayoutForm >
-      <el-form v-if="form" style="margin-bottom:30px;" :model="form" :rules="rules" ref="form" label-width="100px">
+      <el-form v-if="form" style="margin-bottom:30px;" :model="form" :rules="rules" ref="form" label-width="150px">
         <el-form-item label="推送主题" prop="title">
           <el-input v-model="form.title"></el-input>
-          备注：无实质用途，仅作区分使用（字数不超过15个汉字）
+          <p>备注：无实质用途，仅作区分使用（字数不超过15个汉字）</p>
         </el-form-item>
         <el-form-item label="推送时间"  prop="send_time">
           <el-date-picker
@@ -20,6 +20,25 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="链接跳转" prop="url">
+          <el-input v-model="form.url" placeholder="可为空 不跳转"></el-input>
+          <p>备注：可为空 即不可跳转,小程序跳转和URL同时存在 小程序优先 </p>
+          <p>当用户的微信客户端版本不支持跳小程序时，将会跳转至url。</p>
+        </el-form-item>
+         <el-form-item label="小程序跳转appid" prop="appid">
+          <el-input v-model="form.appid" placeholder="可为空 不跳转"></el-input>
+          <p>备注：所需跳转到的小程序appid（该小程序appid必须与发模板消息的公众号是绑定关联关系，暂不支持小游戏,不需要则不填</p>
+        </el-form-item>
+         <el-form-item label="小程序跳转路径" prop="pagepath">
+          <el-input v-model="form.pagepath" placeholder="可为空 不跳转"></el-input>
+          <p>备注：所需跳转到小程序的具体页面路径，支持带参数,（示例index?foo=bar），要求该小程序已发布，暂不支持小游戏,不需要则不填</p>
+        </el-form-item>
+
+         <!-- "miniprogram":{
+             "appid":"xiaochengxuappid12345",
+             "pagepath":"index?foo=bar"
+           },     -->
+
         <!-- <el-form-item>
           <el-button type="primary" @click="validForm" :loading="submiting">保存</el-button>
           <el-button @click="close" v-if="!submiting">取消</el-button>
@@ -59,15 +78,26 @@
 </template>
 
 <script>
-import { getTemplateList, saveOrEditMsg } from '@/api/mpHelper'
+import { getTemplateList, saveOrEditMsg, getOne } from '@/api/mpHelper'
 export default {
   name: 'TmpMsgList',
-  created () {
-    this.getTemplateList()
+  async created () {
+    await this.getTemplateList()
+    if(this.id) {
+      console.log("有id")
+      this.getMsgById(this.id)
+    }
   },
   data() {
     return {
-      form: {},
+      form: {
+        send_time: "",
+        send_object: "",
+        title: "",
+        url: "",
+        appid: "",
+        pagepath: ""
+      },
       msgcontent: {},
       addDialogShow: true,
       temList: [],
@@ -108,14 +138,33 @@ export default {
     }
   },
   computed: {
-    templateId() {
-      return this.$route.params.templateId
+    template_id() {
+      return this.$route.query.template_id
     },
-//     records() {
-// 　　　　return this.temObj.records
-// 　　}
+    id() {
+      return this.$route.query.id
+    }
   },
   methods: {
+    async getMsgById(id) {
+      let rs = await getOne(Number(id))
+      console.log(rs)
+      if (rs.code == 0) {
+        const {send_data, send_time, send_object, title, url, miniprogram} = rs.data
+        this.form.send_time = send_time
+        this.form.send_object = send_object
+        this.form.title = title
+        this.form.url = url
+        this.form.miniprogram = JSON.parse(miniprogram) || {}
+        // 设置已保存的值
+        Object.values(JSON.parse(send_data)).forEach((item, i )=> {
+         this.$set(this.records[i], "value", item.value)
+         this.$set(this.records[i], "color", item.color)
+        })
+      } else {
+
+      }
+    },
     renderPreview() {
       this.content.map((item, i) => {
         let rs = this.records.filter(e => e.index == i)
@@ -141,44 +190,26 @@ export default {
       this.records.forEach((item, index) => {
          send_data[item.key.replace(".DATA", "")] = {value : item.value || item.text, color: item.color }
       })
-      console.log(send_data)
-
       let obj = {
         openid: "ob1dPv0DSdECDT-0kfI4LLN6lFYI",
         // openid: "ob1dPv7cHpVYkiKU0FF95sPk7ptk",
-        template_id: this.templateId,
+        template_id: this.template_id,
         send_data,
-        // data: {
-        //   "first": {
-        //     "value":"模板消息发送测试！",
-        //     "color":"#173177"
-        //   },
-        //   "keyword1":{
-        //       "value":"你的小宝贝该续费了",
-        //       "color":"#173177"
-        //   },
-        //   "keyword2": {
-        //       "value":"2020-05-15 14:58:33",
-        //       "color":"#173177"
-        //   },
-        //   "keyword3": {
-        //       "value":"2014年9月22日",
-        //       "color":"#173177"
-        //   },
-        //   "remark":{
-        //       "value":"欢迎关注本公众号！",
-        //       "color":"#173177"
-        //   }
-        // },
         url: "https://www.baidu.com"
       }
       // this.form.asgin({},obj)
 
       let rs = await saveOrEditMsg(Object.assign(this.form,obj))
       console.log(rs)
-      // if (rs.code == 0) {
-      //   this.temList = rs.data.list
-      // }
+      if (rs.code == 0) {
+        this.$message("保存成功")
+        this.$router.go(-1)
+      } else {
+        this.$message({
+           message: rs.msg,
+          type: 'success'
+        })
+      }
     },
     onSearch() {
       this.loading = true
@@ -189,7 +220,7 @@ export default {
       let rs = await getTemplateList()
       if (rs.code == 0) {
         this.temList = rs.data.list
-        this.temObj = this.temList.find(item => item.template_id == this.templateId)
+        this.temObj = this.temList.find(item => item.template_id == this.template_id)
         this.content = this.temObj.content.split('\n')
         let regex = /\{\{(.+?)\}\}/g;
         let result;
@@ -210,6 +241,14 @@ export default {
 <style lang="scss" scoped>
 /deep/ .el-form-item__label {
   padding-bottom: 0px;
+}
+/deep/ .el-form-item {
+  margin-bottom: 10px;
+}
+/deep/ .el-form-item__content p {
+  font-size: 12px;
+  margin:0;
+  line-height: 24px;
 }
 .inputlabel {
   line-height: 30px;

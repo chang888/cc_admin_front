@@ -96,7 +96,7 @@ export default {
         title: "",
         url: "",
         appid: "",
-        pagepath: ""
+        pagepath: "",
       },
       msgcontent: {},
       addDialogShow: true,
@@ -143,6 +143,12 @@ export default {
     },
     id() {
       return this.$route.query.id
+    },
+    "form.miniprogram" () {
+      return {
+        appid: this.form.appid,
+        pagepath: this.form.pagepath
+      }
     }
   },
   methods: {
@@ -194,8 +200,8 @@ export default {
         openid: "ob1dPv0DSdECDT-0kfI4LLN6lFYI",
         // openid: "ob1dPv7cHpVYkiKU0FF95sPk7ptk",
         template_id: this.template_id,
+        id: +this.id,
         send_data,
-        url: "https://www.baidu.com"
       }
       // this.form.asgin({},obj)
 

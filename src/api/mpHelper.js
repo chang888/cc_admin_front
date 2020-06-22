@@ -44,5 +44,12 @@ export function getMsgList() {
     method: 'post',
   })
 }
+export function previewMsg(id) {
+  return request({
+    url: 'admin/mp/temMsg/preview',
+    method: 'post',
+    data: {id}
+  })
+}
 
 

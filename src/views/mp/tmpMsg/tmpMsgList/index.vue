@@ -24,7 +24,7 @@
           label="操作"
           width="300">
           <template slot-scope="scope">
-              <el-button size="mini" type="primary" @click="gotoEdit(scope.row)">预览</el-button>
+              <el-button size="mini" type="primary" @click="preview(scope.row)">预览</el-button>
               <el-button size="mini" type="success" @click="gotoEdit(scope.row)">发送</el-button>
               <el-button size="mini" type="warning" @click="gotoEdit(scope.row)">编辑</el-button>
               <el-button size="mini" type="danger" @click="del(scope.row)">删除</el-button>
@@ -54,11 +54,17 @@
               </el-table-column>
         </LayoutTable>
     </LayoutDialog>
+    <LayoutDialog v-model="priviewShow" title="模板消息预览" :closeOnClickModal="false">
+      <div class="previewbox">
+        <img class="qrcode" :src="'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='+ticket" alt="">
+        <p>每次生成的二维码有效期10分钟</p>
+      </div>
+    </LayoutDialog>
   </div>
 </template>
 
 <script>
-import { getTemplateList, getMsgList, delMsg } from '@/api/mpHelper'
+import { getTemplateList, getMsgList, delMsg, previewMsg } from '@/api/mpHelper'
 export default {
   name: 'TmpMsgList',
   created () {
@@ -71,14 +77,25 @@ export default {
   data() {
     return {
       addDialogShow: false,
+      priviewShow: false,
       temList: [],
+      ticket: ""
     }
   },
   methods: {
-    async del(row) {
-      let rs = await delMsg(row.id)
+    async del({id}) {
+      let rs = await delMsg(id)
       if (rs.code == 0) {
         this.onSearch()
+        this.$message({
+          message: rs.msg,
+          type: "success"
+        })
+      } else {
+        this.$message({
+          message: rs.msg,
+          type: "fail"
+        })
       }
     },
     async getMsgList() {
@@ -87,6 +104,19 @@ export default {
       if (rs.code == 0) {
         this.temList = rs.data.list
       }
+    },
+    async preview({id}) {
+      let rs = await previewMsg(id)
+      if (rs.code == 0) {
+       this.ticket = rs.data.ticket
+      } else {
+        this.$message({
+          message: rs.msg,
+          type: "fail"
+        })
+      }
+      this.priviewShow = true
+
     },
     gotoEdit({template_id, id}) {
       this.$router.push(`tmpMsgEdit?template_id=${template_id}&id=${id}`)
@@ -98,7 +128,7 @@ export default {
     onSearch() {
       this.loading = true
       console.log(this.$refs)
-      this.$refs.myTable.search()
+      this.$refs.msgList.search()
     },
     async getTemplateList() {
       let rs = await getTemplateList()
@@ -116,4 +146,12 @@ export default {
    white-space: pre-line;
    text-align: left;
 }
+.previewbox {
+  text-align: center;
+  .qrcode {
+    width: 240px;
+    height: 240px;
+  }
+}
+
 </style>

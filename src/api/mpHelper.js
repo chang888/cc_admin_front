@@ -8,14 +8,6 @@ export function getTemplateList(data) {
   })
 }
 
-export function sendMsg(data) {
-  return request({
-    url: 'admin/mp/temMsg/sendMsg',
-    method: 'post',
-    data
-  })
-}
-
 export function saveOrEditMsg(data) {
   return request({
     url: 'admin/mp/temMsg/saveOrEdit',
@@ -49,6 +41,19 @@ export function previewMsg(id) {
     url: 'admin/mp/temMsg/preview',
     method: 'post',
     data: {id}
+  })
+}
+export function sendMsg(id) {
+  return request({
+    url: 'admin/mp/temMsg/send',
+    method: 'post',
+    data: {id}
+  })
+}
+export function getTagsList() {
+  return request({
+    url: 'admin/mp/tags/list',
+    method: 'get',
   })
 }
 

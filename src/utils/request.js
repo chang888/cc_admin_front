@@ -5,7 +5,7 @@ import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
@@ -71,15 +71,12 @@ service.interceptors.response.use(
     //   return res
     // }
     if (res.code == 401) {
-      MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-        confirmButtonText: 'Re-Login',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        store.dispatch('user/resetToken').then(() => {
-          location.reload()
-        })
-      })
+      MessageBox.alert('登陆信息已失效请重新登陆', '提示')
+      // store.dispatch('user/resetToken').then(() => {
+      //   location.reload()
+
+      // })
+
     }
     return res
   },

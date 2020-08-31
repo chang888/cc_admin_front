@@ -4,7 +4,15 @@
       <slot></slot>
     </el-table>
     <div class="paginate-pager" v-if="showPager">
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pager.currentPage" :page-sizes="pager.pageSizes" :page-size="pager.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="pager.total">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pager.currentPage"
+        :page-sizes="pager.pageSizes"
+        :page-size="pager.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pager.total"
+      >
       </el-pagination>
     </div>
   </div>
@@ -16,32 +24,32 @@ export default {
   props: {
     param: {
       require: false,
-      type: Object
+      type: Object,
     },
     debounce: {
       require: false,
-      type: Number
+      type: Number,
     },
     url: {
       require: false,
-      type: String
+      type: String,
     },
     showPager: {
       require: false,
-      type: Boolean
+      type: Boolean,
     },
     filter: {
       require: false,
-      type: Function
+      type: Function,
     },
     disableAutoHeight: {
       require: false,
-      type: Boolean
+      type: Boolean,
     },
     immediate: {
       default: true,
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
   data() {
     return {
@@ -49,7 +57,7 @@ export default {
       loading: false,
       list: [],
       pager: null,
-      autoSearchInd: null
+      autoSearchInd: null,
     }
   },
   computed: {
@@ -58,20 +66,21 @@ export default {
         return this.filter(this.list)
       }
       return this.list
-    }
+    },
   },
   watch: {
     data: {
       deep: true,
       handler() {
         this.autoHeight()
-      }
+      },
+      immediate: true
     },
     url: {
       deep: false,
       handler() {
         this.research()
-      }
+      },
     },
     param: {
       deep: true,
@@ -80,8 +89,8 @@ export default {
           clearTimeout(this.autoSearchInd)
         }
         this.autoSearchInd = setTimeout(this.research, this.debounce || 500)
-      }
-    }
+      },
+    },
   },
   methods: {
     autoHeight() {
@@ -89,25 +98,30 @@ export default {
         return
       }
       this.$nextTick(() => {
-        let pageHeight = this.$el.parentElement.offsetHeight
-        let bros = this.$el.parentElement.childNodes
-        let brosHeight = 0
-        for (let i = 0; i < bros.length; i++) {
-          if (bros[i] !== this.$el) {
-            if (bros[i].offsetHeight) {
-              brosHeight = brosHeight + bros[i].offsetHeight
+        setTimeout(() => {
+          let pageHeight = this.$el.parentElement.offsetHeight;
+          let bros = this.$el.parentElement.childNodes;
+          let brosHeight = 0;
+          for (let i = 0; i < bros.length; i++) {
+            if (bros[i] !== this.$el) {
+              if (bros[i].offsetHeight) {
+                brosHeight = brosHeight + bros[i].offsetHeight;
+              }
             }
           }
-        }
-        this.$el.style.height = pageHeight - brosHeight - 20 + "px"
-        if (this.pager) {
-          this.maxTableHeight =
-            this.$el.offsetHeight -
-            this.$el.querySelector(".paginate-pager").offsetHeight
-        } else {
-          this.maxTableHeight = this.$el.offsetHeight
-        }
-      })
+          this.$el.style.height = pageHeight - brosHeight - 20 + "px";
+          if (this.showPager && this.pager) {
+            this.maxTableHeight =
+              this.$el.offsetHeight -
+              this.$el.querySelector(".paginate-pager").offsetHeight;
+          } else {
+            this.maxTableHeight = this.$el.offsetHeight;
+          }
+          this.$el.querySelector(".el-table__body-wrapper").style.maxHeight =
+            this.$el.querySelector(".el-table__body-wrapper").style
+              .offsetHeight + "px";
+        }, 500);
+      });
     },
     handleSizeChange(s) {
       this.pager.pageSize = s
@@ -141,7 +155,7 @@ export default {
       let rs = await this.$post(this.url, form)
       if (rs.code == "0") {
         // 添加loading属性
-        rs.data.list.forEach(item => {
+        rs.data.list.forEach((item) => {
           let originData = Object.assign({}, item)
           item.originData = originData
           item.loading = false
@@ -149,20 +163,22 @@ export default {
         this.list = rs.data.list
         this.pager = rs.data.pager
       }
-      this.autoHeight()
+      console.log("执行autoheight")
+
+      // this.autoHeight()
       this.loading = false
       this.$emit("loaded", rs)
     },
     expandChange(row, expandedRows) {
       this.$emit("expand-change", row, expandedRows)
-    }
+    },
   },
   created() {
     if (this.showPager) {
       this.pager = {
         currentPage: 1,
         pageSize: 30,
-        pageSizes: [30, 50, 100, 200]
+        pageSizes: [30, 50, 100, 200],
       }
     }
     window.addEventListener("resize", this.autoHeight)
@@ -170,14 +186,14 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.autoHeight)
-  }
+  },
 }
 </script>
 
 <style scoped>
 .paginate-table {
   height: calc(100% - 50px);
-  min-height: 400px;
+  /* min-height: 450px; */
   margin: 10px;
   overflow: auto;
 }

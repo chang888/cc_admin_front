@@ -147,6 +147,8 @@ export default {
         this.form.title = title
         this.form.url = url
         this.form.miniprogram = JSON.parse(miniprogram) || {}
+        this.form.appid =  this.form.miniprogram.appid
+        this.form.pagepath =  this.form.miniprogram.pagepath
         // 设置已保存的值
         Object.values(JSON.parse(send_data)).forEach((item, i) => {
           this.$set(this.records[i], "value", item.value)
@@ -186,9 +188,11 @@ export default {
         template_id: this.template_id,
         id: +this.id,
         send_data,
+        miniprogram: {
+          appid: this.form.appid,
+          pagepath: this.form.pagepath,
+        }
       }
-      // this.form.asgin({},obj)
-
       let rs = await saveOrEditMsg(Object.assign(this.form, obj))
       console.log(rs)
       if (rs.code == 0) {

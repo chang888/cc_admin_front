@@ -24,13 +24,13 @@
             <el-tag v-if="scope.row.status == 4" type="warning">待发送</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="创建时间" width="160" align="center"> </el-table-column>
-        <el-table-column prop="updated_at" label="更新时间" width="160" align="center"> </el-table-column>
+        <el-table-column prop="created_at" label="创建时间" width="160" align="center" />
+        <el-table-column prop="updated_at" label="更新时间" width="160" align="center" />
         <el-table-column label="操作" width="300">
           <template slot-scope="scope">
             <el-button size="mini" type="warning" @click="gotoEdit(scope.row)">编辑</el-button>
             <el-button size="mini" type="primary" @click="preview(scope.row)">预览</el-button>
-            <el-button size="mini" type="success" v-if="scope.row.status != 0" @click="send(scope.row)">发送</el-button>
+            <el-button size="mini" type="success" v-if="scope.row.status == 0" @click="send(scope.row)">发送</el-button>
             <el-button size="mini" type="danger" @click="del(scope.row)">删除</el-button>
           </template>
         </el-table-column>

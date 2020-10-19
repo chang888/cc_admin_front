@@ -11,7 +11,7 @@
         </el-form-item>
         <el-form-item label="发送对象" prop="send_object">
           <el-select v-model="form.send_object" placeholder="请选择发送对象" filterable clearable>
-            <el-option v-for="item in group" :key="item.id" :label="item.name" :value="String(item.id)"></el-option>
+            <el-option v-for="item in group" :label="item.name" :key="item.id" :value="String(item.id)">{{item.name}} <span style="color:#43ad7f7f;padding-left:10px">{{item.id != -1 ? '(人数' + item.count +') ': ""}}</span></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="链接跳转" prop="url">
